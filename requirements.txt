@@ -1,0 +1,7 @@
+discord.py
+pymongo
+openai
+tiktoken
+python-dotenv
+lmstudio
+pydantic
