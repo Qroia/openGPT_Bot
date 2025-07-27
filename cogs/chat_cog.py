@@ -4,6 +4,7 @@ import openai
 
 from utils.admin import get_server_collection, set_balance
 from utils.formula import price_formula
+from utils.lmstudio_interface import lm_respond_message
 from utils.permissions import is_access, is_admin
 from utils.multimodal import is_multimodal
 from utils.channel_management import get_channel_settings, update_channel_settings, add_message_to_channel_history
@@ -125,7 +126,20 @@ class ChatCog(commands.Cog):
                         )
 
                     await set_balance(self.server_collection, message.guild.id, -price_formula(current_tokens, current_settings.get("model")))
-                    await message.channel.send(chat_response)
+                    
+                    # SMART RENAME CHANNEL
+                    channel_name = message.channel.name
+                    channel_id = message.channel.id
+                    if "chat-gpt-" in channel_name:
+                        lm_response = await lm_respond_message([message.content, chat_response])
+                        channel = self.bot.get_channel(channel_id)
+                        await channel.edit(name=str(lm_response))
+
+                    # SEND BLOCK
+                    chunks = [chat_response[i:i+2000] for i in range(0, len(chat_response), 2000)]
+                    
+                    for chunk in chunks:
+                        await message.channel.send(chunk)
 
             except openai.APIStatusError as e:
                 await message.channel.send(f"Произошла ошибка при обращении к OpenAI: `{e}`")

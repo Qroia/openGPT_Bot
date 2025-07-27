@@ -9,11 +9,11 @@ MONGO_URI = os.getenv("MONGO_URI")
 LOCAL_TYPE = os.getenv("LOCAL_TYPE")
 LOCAL_MODELS_URI = os.getenv("LOCAL_MODELS_URI")
 
-SUPPORTED_MODELS = ["chatgpt-4o-latest", "gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "o3-mini", "o4-mini-2025-04-16", "o1", "o3-pro", "o3"]
-MODELS_WITHOUT_TEMPERATURE = ["o1", "o3-pro", "o3", "o3-mini", "o4-mini-2025-04-16"]
+SUPPORTED_MODELS = ["chatgpt-4o-latest", "gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "o3-mini", "o4-mini", "o1", "o3-pro", "o3"]
+MODELS_WITHOUT_TEMPERATURE = ["o1", "o3-pro", "o3", "o3-mini", "o4-mini"]
 DEEPSEEK_MODELS = ["r1", "v3"]
 GEMINI_MODELS = ["2.5-flash", "2.5-pro"]
-MULTIMODAL_MODELS = ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini", "o3", "o3-pro", "o4-mini-2025-04-16", "o1"]
+MULTIMODAL_MODELS = ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini", "o3", "o3-pro", "o4-mini", "o1"]
 #LOCAL_MODELS = get_local_models(LOCAL_TYPE, LOCAL_MODELS_URI)
 
 INDIVIDUAL_MAX_TOKENS_PER_CHAT = 15000
@@ -31,7 +31,8 @@ GPT_PRICE_MODELS = {
     "o3-mini": 0.015 * C_PRICE,
     "gpt-4.1": 0.03 * C_PRICE,
     "gpt-4.1-mini": 0.006 * C_PRICE,
-    "gpt-4.1-nano": 0.0025 * C_PRICE
+    "gpt-4.1-nano": 0.0025 * C_PRICE,
+    "o4-mini": 0.017 * C_PRICE,
 }
 
 # ONLY FOR TEST

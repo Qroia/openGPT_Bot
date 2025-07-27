@@ -31,31 +31,37 @@ async def add_message_to_project_history(projects_collection, category_id: int, 
         }
         await update_project_settings(projects_collection, category_id, settings)
 
-    settings["model"] = "gpt-4o"
-
     history = settings.get("history", [])
     if image:
-        base64_image_data_url = await get_image_as_base64_data_url(image[0])
-        history.append({"role": role, "content": [
-            {"type": "text", "text": content},
+        images_links = []
+        for item in image:
+            base64_image_data_url = await get_image_as_base64_data_url(item)
+            images_links.append(base64_image_data_url)
+        
+        images_content_list = [
             {
                 "type": "image_url",
                 "image_url": {
-                    "url": base64_image_data_url,
+                    "url": url,
                     "detail": "high"
                 },
-            },
-        ]})
+            }
+            for url in images_links
+        ]
+
+        history.append({"role": role, "content": [
+            {"type": "text", "text": content},
+        ] + images_content_list })
     else:
         history.append({"role": role, "content": content})
 
-    encoding = tiktoken.encoding_for_model(settings.get("model", "gpt-4o"))
+    encoding = tiktoken.encoding_for_model("gpt-4o")
     current_tokens = 0
     for m in history:
         if isinstance(m["content"], str):
             current_tokens += len(encoding.encode(m["content"]))
         else:
-            current_tokens += len(encoding.encode(m["content"][0]["text"])) + 2000
+            current_tokens += len(encoding.encode(m["content"][0]["text"])) + (2000 * (len(m["content"]) - 1))
 
     while current_tokens > settings.get("token_limit", config.PROJECT_MAX_TOKENS_PER_CHAT) and len(history) > 1:
         if settings.get("global_message") and history[0].get("role") == "system":
@@ -65,7 +71,7 @@ async def add_message_to_project_history(projects_collection, category_id: int, 
         if isinstance(m["content"], str):
             current_tokens -= len(encoding.encode(removed_message["content"]))
         else:
-            current_tokens -= len(encoding.encode(removed_message["content"][0]["text"])) - 2000
+            current_tokens -= len(encoding.encode(removed_message["content"][0]["text"])) - (2000 * (len(m["content"]) - 1))
 
     await update_project_settings(projects_collection, category_id, {"history": history})
     return history, current_tokens
